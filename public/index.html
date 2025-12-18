@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nano Banana Demo</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #050817;
+        --card: #0d1020;
+        --accent: #facc15;
+        --accent-soft: rgba(250, 204, 21, 0.12);
+        --text: #f9fafb;
+        --muted: #9ca3af;
+        --border: #1f2937;
+        --error: #f97373;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .shell {
+        max-width: 1100px;
+        width: 100%;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(15, 23, 42, 0.95));
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        box-shadow: 0 32px 80px rgba(15, 23, 42, 0.85);
+        padding: 1px;
+      }
+
+      .inner {
+        border-radius: 1.45rem;
+        background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.08), transparent 55%),
+          radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.1), transparent 55%),
+          #020617;
+        padding: 1.75rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+        gap: 1.75rem;
+      }
+
+      @media (max-width: 900px) {
+        .inner {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid rgba(250, 204, 21, 0.5);
+        background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.27), transparent 60%),
+          rgba(15, 23, 42, 0.85);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .badge-dot {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+      }
+
+      p.lead {
+        margin: 0 0 1.2rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .pill {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        color: var(--muted);
+      }
+
+      label {
+        display: block;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+
+      textarea,
+      input[type="number"] {
+        width: 100%;
+        border-radius: 0.9rem;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+        padding: 0.7rem 0.8rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        resize: vertical;
+        min-height: 110px;
+      }
+
+      textarea:focus,
+      input[type="number"]:focus {
+        border-color: rgba(250, 204, 21, 0.7);
+        box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35);
+      }
+
+      textarea::placeholder {
+        color: rgba(148, 163, 184, 0.65);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.75rem;
+      }
+
+      .batch {
+        flex: 0 0 115px;
+      }
+
+      input[type="number"] {
+        min-height: auto;
+      }
+
+      button {
+        border-radius: 999px;
+        border: none;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: radial-gradient(circle at top left, #facc15, #f59e0b);
+        color: #292524;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        box-shadow: 0 16px 40px rgba(251, 191, 36, 0.45);
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+        box-shadow: none;
+      }
+
+      .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.35rem;
+      }
+
+      .results-shell {
+        border-radius: 1.1rem;
+        background: radial-gradient(circle at top, rgba(15, 23, 42, 0.5), rgba(3, 7, 18, 0.95));
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        padding: 1rem;
+        min-height: 260px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.8rem;
+      }
+
+      .results-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--muted);
+      }
+
+      .status {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .status-dot {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .status-dot.idle {
+        background: #6b7280;
+      }
+
+      .status-dot.error {
+        background: var(--error);
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.6rem;
+        width: 100%;
+      }
+
+      .card {
+        position: relative;
+        border-radius: 0.9rem;
+        overflow: hidden;
+        background: #020617;
+        border: 1px solid rgba(31, 41, 55, 0.9);
+      }
+
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .card-footer {
+        padding: 0.4rem 0.55rem 0.5rem;
+        font-size: 0.7rem;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .chip {
+        padding: 0.1rem 0.4rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        font-size: 0.65rem;
+      }
+
+      .empty-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+        border-radius: 0.9rem;
+        border: 1px dashed rgba(55, 65, 81, 0.9);
+        padding: 1.5rem 1rem;
+      }
+
+      .empty-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 85, 99, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+      }
+
+      .log {
+        margin-top: 0.8rem;
+        font-size: 0.75rem;
+        color: var(--muted);
+        max-height: 120px;
+        overflow-y: auto;
+      }
+
+      .log-line {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .error-text {
+        color: var(--error);
+      }
+
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 2px solid rgba(15, 23, 42, 0.4);
+        border-top-color: #0f172a;
+        border-right-color: #0f172a;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="inner">
+        <section>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            Live Nano Banana Demo
+          </div>
+          <h1>Nano Banana Prompt Console</h1>
+          <p class="lead">
+            Use this screen with clients to type an outfit or cosplay prompt, send it to your Nano Banana server,
+            and show the generated images in real time.
+          </p>
+
+          <div class="pill-row">
+            <span class="pill">Outfits of the Day</span>
+            <span class="pill">Cosplays</span>
+            <span class="pill">Batch Generation</span>
+            <span class="pill">Client‑friendly UI</span>
+          </div>
+
+          <div>
+            <label for="prompt">Prompt</label>
+            <textarea
+              id="prompt"
+              placeholder="Full body photo of a stylish young woman in a modern streetwear outfit, soft natural lighting, urban city street, 9:16 vertical..."
+            ></textarea>
+            <div class="row">
+              <div class="batch">
+                <label for="batchSize">Batch</label>
+                <input id="batchSize" type="number" min="1" max="10" value="1" />
+                <div class="hint">Number of images</div>
+              </div>
+              <div>
+                <button id="generateBtn">
+                  <span>Generate with Nano Banana</span>
+                </button>
+                <div class="hint">API: POST /api/generate → your Nano Banana Server</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="results-shell">
+          <div class="results-header">
+            <div class="results-title">Latest outputs</div>
+            <div class="status" id="status">
+              <span class="status-dot idle" id="statusDot"></span>
+              <span id="statusText">Idle</span>
+            </div>
+          </div>
+
+          <div id="gallery" class="gallery"></div>
+
+          <div id="emptyState" class="empty-state">
+            <div class="empty-icon">✨</div>
+            <div>Waiting for your first Nano Banana generation…</div>
+            <div style="font-size: 0.78rem">
+              Use one of your OOTD or cosplay prompts and click <strong>Generate</strong>.
+            </div>
+          </div>
+
+          <div class="log" id="log"></div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const promptEl = document.getElementById("prompt");
+      const batchSizeEl = document.getElementById("batchSize");
+      const generateBtn = document.getElementById("generateBtn");
+      const galleryEl = document.getElementById("gallery");
+      const emptyStateEl = document.getElementById("emptyState");
+      const logEl = document.getElementById("log");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+
+      let isLoading = false;
+
+      function setStatus(state, message) {
+        statusDot.classList.remove("idle", "error");
+        statusDot.classList.add(state === "error" ? "error" : state === "idle" ? "idle" : "");
+        statusText.textContent = message;
+      }
+
+      function appendLog(message, isError = false) {
+        const line = document.createElement("div");
+        line.className = "log-line" + (isError ? " error-text" : "");
+        const ts = new Date().toLocaleTimeString();
+        line.textContent = `[${ts}] ${message}`;
+        logEl.prepend(line);
+      }
+
+      async function handleGenerate() {
+        const prompt = promptEl.value.trim();
+        const batchSize = parseInt(batchSizeEl.value || "1", 10);
+
+        if (!prompt) {
+          appendLog("Please enter a prompt first.", true);
+          return;
+        }
+
+        isLoading = true;
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span class="spinner"></span><span>Generating…</span>';
+        setStatus("", "Generating…");
+
+        try {
+          const res = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, batchSize })
+          });
+
+          if (!res.ok) {
+            const text = await res.text();
+            appendLog(`API error: ${res.status} ${text}`, true);
+            setStatus("error", "API error");
+            return;
+          }
+
+          const data = await res.json();
+
+          // Expect possible shapes and normalize to a list of URLs or base64 strings.
+          let images = [];
+          if (Array.isArray(data.images)) {
+            images = data.images;
+          } else if (Array.isArray(data.results)) {
+            images = data.results.map((r) => r.url || r.image || r.base64 || r.data).filter(Boolean);
+          }
+
+          if (!images.length) {
+            appendLog("No images returned from API.", true);
+            setStatus("error", "No images returned");
+            return;
+          }
+
+          emptyStateEl.style.display = "none";
+          galleryEl.innerHTML = "";
+
+          images.forEach((src, index) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const img = document.createElement("img");
+            // If it's a bare base64 string, prefix it for display.
+            if (src && typeof src === "string" && src.startsWith("data:")) {
+              img.src = src;
+            } else if (src && typeof src === "string" && src.match(/^[A-Za-z0-9+/=]+$/)) {
+              img.src = `data:image/png;base64,${src}`;
+            } else {
+              img.src = src;
+            }
+
+            const footer = document.createElement("div");
+            footer.className = "card-footer";
+            footer.innerHTML = `
+              <span>Image ${index + 1}</span>
+              <span class="chip">Nano Banana</span>
+            `;
+
+            card.appendChild(img);
+            card.appendChild(footer);
+            galleryEl.appendChild(card);
+          });
+
+          appendLog(`Received ${images.length} image(s) from Nano Banana.`);
+          setStatus("idle", "Done");
+        } catch (err) {
+          console.error(err);
+          appendLog("Network or server error calling /api/generate.", true);
+          setStatus("error", "Network error");
+        } finally {
+          isLoading = false;
+          generateBtn.disabled = false;
+          generateBtn.textContent = "Generate with Nano Banana";
+        }
+      }
+
+      generateBtn.addEventListener("click", handleGenerate);
+
+      promptEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          if (!isLoading) {
+            handleGenerate();
+          }
+        }
+      });
+    </script>
+  </body>
+  </html>
+
+
